@@ -91,9 +91,9 @@ class Trainer():
                                      #num_workers=self.num_dataloaders,
                                      num_workers=0,
                                     )
-        #for i, batch in tqdm(enumerate(self.testloader), total=len(self.testloader), desc='Valid'):#tqdm：进度条 enumerate（）：同时列出数据和数据索引
+
         for i, batch in tqdm(enumerate(self.testloader)):
-            self.model.eval()#评估模式：不更新权重
+            self.model.eval()
 
             batch = [b.to(self.device) for b in batch]
 
@@ -295,14 +295,7 @@ class Trainer():
                                          s_loss = spreading_loss.item(),
                                         )
 
-                # self._print_progress(loss=loss.item(),
-                #                      rec_loss=rec_loss.item(),
-                #                      entropy_loss=entropy_loss.item(),
-                #                      condi_loss=condi_loss.item(),
-                #                      rec_error=rec_error.sum().item() / batch_size,
-                #                      cls_loss=cls_loss.item(),
-                #                      cls_acc=(cls_acc.sum() / batch_size).item(),
-                #                     )
+
 
                 records['loss'] += [loss.cpu().item()]
                 records['rec_loss'] += [rec_loss.cpu().item()]

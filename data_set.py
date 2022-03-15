@@ -23,7 +23,7 @@ class SENSOR_DATASET():
         self.sensor_channel_size = cfg.sensor_channel_size
         self.testdataset_dir = cfg.testdataset_dir
         self.testnum_instances = cfg.testnum_instances
-        #data_dir = 'G:\\毕业设计\\数据集\\速变数据\\traindata'
+
 
         self.image_channel_size = cfg.image_channel_size
         #train_x, test_x = trainprepro(d_path=self.dataset_dir, length=1000,number=2000, normal=True, rate=[0.9, 0.1], enc=True,enc_step=28)
@@ -55,7 +55,7 @@ class SENSOR_DATASET():
 
 
 
-        #--test时候采用
+        #--test
 
 
         """

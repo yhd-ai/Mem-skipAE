@@ -30,15 +30,15 @@ torch.cuda.empty_cache()
 torch.set_default_tensor_type(torch.DoubleTensor)
 def config():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset-dir', type=str, default='G:\\毕业设计\\数据集\\速变数据\\traindata\\')
-    parser.add_argument('--testdataset-dir', type=str, default='G:\\毕业设计\\数据集\\速变数据\\testdata\\')
+    parser.add_argument('--dataset-dir', type=str, default='')
+    parser.add_argument('--testdataset-dir', type=str, default='')
     #parser.add_argument('--prepro-dir', type=str, default='prepro/MNIST')
     parser.add_argument('--testnum-instances', type=int, default=15)
     parser.add_argument('--num-instances', type=int, default=10)
     parser.add_argument('--num-classes', type=int, default=60000)
     parser.add_argument('--num-memories', type=int, default=100)
-    parser.add_argument('--sensor-length', type=int, default=1000)  #信号样本长度默认为3000
-    parser.add_argument('--sensor-channel-size', type=int, default=18) #18源信号合成
+    parser.add_argument('--sensor-length', type=int, default=1000)
+    parser.add_argument('--sensor-channel-size', type=int, default=18)
     #parser.add_argument('--image-width', type=int, default=28)
     parser.add_argument('--image-channel-size', type=int, default=1)
 
@@ -80,7 +80,7 @@ def main(cfg):
     torch.manual_seed(cfg.seed)
     torch.cuda.manual_seed_all(cfg.seed)
     np.random.seed(cfg.seed)
-    random.seed(cfg.seed)#GPU设置
+    random.seed(cfg.seed)
 
     if cfg.ckpt:
         if not os.path.exists(cfg.ckpt):

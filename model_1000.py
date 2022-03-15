@@ -12,9 +12,9 @@ class CNNMEAE(nn.Module):
 
     def __init__(self, cfg, device):
         super(CNNMEAE, self).__init__()
-        self.device = device#运行的设备cpu/gpu
+        self.device = device
 
-        self.cls_loss_coef = cfg.cls_loss_coef #default=0 作用？
+        self.cls_loss_coef = cfg.cls_loss_coef
         self.sensor_channel_size = cfg.sensor_channel_size
         self.sensor_length = cfg.sensor_length
         self.num_instances = cfg.num_instances
@@ -29,7 +29,7 @@ class CNNMEAE(nn.Module):
         self.addressing = cfg.addressing
         self.conv_channel_size = cfg.conv_channel_size
 
-        self.feature_size = int(7872/8) #不知道为什么要乘以4*4*4
+        self.feature_size = int(7872/8)
         self.drop_rate = cfg.drop_rate
 
         self.encoder = Encoder(image_channel_size=self.image_channel_size,
@@ -45,15 +45,15 @@ class CNNMEAE(nn.Module):
 
 
         """
-        init_mem = torch.zeros(self.num_memories, self.feature_size) #记忆单元的权重矩阵清零
+        init_mem = torch.zeros(self.num_memories, self.feature_size)
         nn.init.kaiming_uniform_(init_mem)
-        nn.init.sparse_(init_mem,0.2)#初始化权重参数
+        nn.init.sparse_(init_mem,0.2)
         
-        self.memory = nn.Parameter(init_mem)   #将不可训练的tensor 转化成可以训练的parameter
+        self.memory = nn.Parameter(init_mem)
 
 
 
-        self.cosine_similarity = nn.CosineSimilarity(dim=2,) #第二个维度余弦相似度
+        self.cosine_similarity = nn.CosineSimilarity(dim=2,)
 #        self.defusion = deFusion(self.sensor_channel_size)
         self.decoder = Decoder(sensor_channel_size=self.sensor_channel_size,
                                sensor_length=self.sensor_length,
@@ -79,17 +79,16 @@ class CNNMEAE(nn.Module):
         z,e1,e2,e3,e4 = self.encoder(x)
 
         #nonlocal z_hat
-        ex_mem = self.memory.unsqueeze(0).repeat(batch, 1, 1) #给mem增加第一个维度，且第一个维度的size为batch（batch，num_memories,feature_size）
-        ex_z = z.unsqueeze(1).repeat(1, self.num_memories, 1)#给mem增加第二个维度，第二个维度的size为记忆单元数量(batch，num_memories,feature_size）
+        ex_mem = self.memory.unsqueeze(0).repeat(batch, 1, 1)
+        ex_z = z.unsqueeze(1).repeat(1, self.num_memories, 1)
 
         mem_logit = self.cosine_similarity(ex_z, ex_mem)
-        #print(mem_logit.shape)#计算记忆单元和encoder后第二个维度的余弦相似度
+
 
         mem_weight = F.softmax(mem_logit, dim=1)
-        #print(mem_weight)#对张量的第二个维度进行softmax分类
-        #print(self.memory.shape)
-        if self.addressing == 'soft':#soft类
-            z_hat = torch.matmul(mem_weight, self.memory)#给decoder的embedding是记忆权重矩阵和记忆矩阵的乘积
+
+        if self.addressing == 'soft':
+            z_hat = torch.matmul(mem_weight, self.memory)
         elif self.addressing == 'sparse':#稀疏类
             mem_weight = (self.relu(mem_weight - self.threshold) * mem_weight) \
                             / (torch.abs(mem_weight - self.threshold) + self.epsilon)
@@ -141,7 +140,7 @@ class CNNMEAE(nn.Module):
 
         #mem_weight = 0
 
-        rec_x = self.decoder(z_hat,e1,e2,e3,e4)#rec_x是重构的原图
+        rec_x = self.decoder(z_hat,e1,e2,e3,e4)
         #rec_x = self.defusion(rec_x1)
         #if self.cls_loss_coef > 0.0:
         #    logit_x = self.classifier(rec_x)
@@ -163,47 +162,7 @@ class CNNMEAE(nn.Module):
         logit_x = torch.zeros(batch, self.num_classes).to(self.device)
         return dict(rec_x=rec_x, logit_x=logit_x)
 
-"""class Fusion(nn.Module):
-    def __init__(self,sensor_channel_size,device):
-        super(Fusion, self).__init__()
-        self.sensor_channel_size = sensor_channel_size
-        self.conv1 = nn.Conv2d(in_channels = 1,
-                               out_channels = 1,
-                               kernel_size = (self.sensor_channel_size,1),
-                               stride=1,
-                               padding=0,
-                                )
-        self.rule = nn.LeakyReLU(inplace=True)
-        self.device = device
-    def forward(self,x):
-        x = x.type(torch.DoubleTensor).cuda(device=self.device)
-        x = self.conv1(x)
-        x = self.rule(x)
-        return x
-"""
 
-"""class deFusion(nn.Module):
-    def __init__(self,sensor_channel_size):
-        super(deFusion, self).__init__()
-        self.sensor_channel_size = sensor_channel_size
-        self.conv_1 = nn.ConvTranspose2d(in_channels = 1,
-                                         out_channels = 1,
-                                         kernel_size = (self.sensor_channel_size,1),
-                                         stride=1,
-                                         padding=0,
-
-        )
-        self.rule = nn.Sigmoid()
-        #self.rule = nn.LeakyReLU()
-    def forward(self,x):
-        x = x.unsqueeze(1)
-        x = self.conv_1(x)
-        x = self.rule(x)
-        #x = print(x.shape)
-        #x = x[:,:,:,:3000]
-        #print(x.shape)
-        return x
-"""
 class Encoder(nn.Module):
     def __init__(self, image_channel_size, conv_channel_size):
         super(Encoder, self).__init__()
@@ -325,7 +284,7 @@ class Decoder(nn.Module):
         x = x.view(-1,8 ,1,123)
         #print(x.shape)
         #print(e4.shape)
-        x = self.deconv1(x)
+        x = self.deconv1(x+e4)
         x = self.bn1(x)
         x = self.relu(x)
         #print(x.shape)
@@ -347,52 +306,3 @@ class Decoder(nn.Module):
         #x = self.tan(x)
         #print(x.shape)
         return x
-
-
-"""class Classifier(nn.Module):
-    def __init__(self, image_channel_size, conv_channel_size, num_classes, drop_rate):
-        super(Classifier, self).__init__()
-        self.image_channel_size = image_channel_size
-        self.conv_channel_size = conv_channel_size
-        self.num_classes = num_classes
-        self.drop_rate = drop_rate
-
-        self.conv1 = nn.Conv1d(in_channels=self.image_channel_size,
-                               out_channels=6,
-                               kernel_size=5,
-                              )
-
-        self.conv2 = nn.Conv1d(in_channels=6,
-                               out_channels=16,
-                               kernel_size=5,
-                              )
-
-        self.fc1 = nn.Linear(in_features=16*4*4, out_features=256,)
-        self.fc2 = nn.Linear(in_features=256, out_features=128,)
-        self.fc3 = nn.Linear(in_features=128, out_features=self.num_classes,)
-
-        self.maxpool2d = nn.MaxPool1d(kernel_size=2,)
-        self.relu = nn.ReLU(inplace=True)
-        # self.dropout = nn.Dropout(p=self.drop_rate)
-
-    def forward(self, x):
-        x = self.conv1(x)
-        x = self.maxpool2d(x)
-        x = self.relu(x)
-
-        x = self.conv2(x)
-        x = self.maxpool2d(x)
-        x = self.relu(x)
-
-        x = x.view(x.size(0), -1)
-
-        x = self.fc1(x)
-        x = self.relu(x)
-        # x = self.dropout(x)
-
-        x = self.fc2(x)
-        x = self.relu(x)
-        # x = self.dropout(x)
-
-        x = self.fc3(x)
-        return x"""""

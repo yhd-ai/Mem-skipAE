@@ -64,11 +64,8 @@ class Tester():
         else:
             self.test_set = dataloader.data_Test
 
-        """self.collator = BatchCollator(image_height=self.image_height,
-                                      image_width=self.image_width,
-                                      image_channel_size=self.image_channel_size,
-                                     )
-"""
+
+
     def test(self):
         records = dict(loss=[],
                        rec_loss=[],
@@ -114,36 +111,6 @@ class Tester():
             encoding.append(z.cpu().numpy())
             #encodingme.append(z_hat.cpu().numpy())
             memw.append(mem_weight)
-            """if (count == 164):
-                c= 0
-                for n in range(18):
-                    c +=1
-                    x = range(0,1000)
-                    plt.plot(x,imgs[0][0][n].cpu())
-                    plt.plot(x,rec_imgs[0][0][n].cpu())
-                    plt.show()
-                    #if(n == 10):
-                    #    plt.savefig("yichangnewnomeme.png")
-                    #plt.clf()
-            if (count == 1955):
-                c = 0
-                for n in range(18):
-                    c += 1
-                    x = range(0,1000)
-                    plt.plot(x,imgs[0][0][n].cpu())
-                    plt.plot(x,rec_imgs[0][0][n].cpu())
-                    plt.show()
-
-                    #f (n == 10):
-                    #    plt.savefig("zhengchangnomem.png")
-                    #plt.clf()
-            """
-
-
-
-
-
-
 
 
             if self.condi_loss_coef > 0.0:
@@ -175,25 +142,6 @@ class Tester():
 
 
 
-
-            """
-            if rec_loss<=1600:
-                (self.label_hat1400).append(1)
-            else:
-                (self.label_hat1400).append(0)
-            if rec_loss<=1550:
-                (self.label_hat1350).append(1)
-            else:
-                (self.label_hat1350).append(0)
-            if rec_loss<=1300:
-                (self.label_hat1300).append(1)
-            else:
-                (self.label_hat1300).append(0)
-            #label = np.array(self.label)
-            self.label.append(label.item())
-            """
-
-
             if self.cls_loss_coef > 0.0:
                 cls_loss = self.cls_criterion(cls_logit, instances)
                 cls_loss *= self.cls_loss_coef
@@ -212,11 +160,11 @@ class Tester():
             records['rec_error'] += rec_error.cpu().tolist()
             records['cls_loss'] += [cls_loss.cpu().item()]
             records['cls_acc'] += cls_acc.cpu().tolist()
-        #print(labels)
+
         acc_list = []
         f1_list = []
-        recall_list = []#召回率列表
-        pre_list = []#准确率列表
+        recall_list = []
+        pre_list = []
         fpr_list = []
 
 
@@ -281,22 +229,6 @@ class Tester():
         max_fi_index = np.where(f1_list == max_f1 )
         max_acc =max(acc_list)
         max_acc_index = np.where(acc_list == max_acc)
-        #print("max——f1",max_f1)
-        #print("bestf1_loss",max_fi_index)
-        #print("acc",acc_list[max_fi_index])
-        #print("pre", pre_list[max_fi_index])
-        #print("recall", recall_list[max_fi_index])
-        #print()
-        #print("max--ACC",max_acc)
-        #print("bestacc_loss", max_acc_index)
-        #print("f1", f1_list[max_acc_index])
-        #print("pre", pre_list[max_acc_index])
-        #print("recall", recall_list[max_acc_index])
-        #print()
-
-
-        #print(recall_list[1500])
-        #print(pre_list[1500])
 
         pl.ylabel("p")
         pl.xlabel("r")
@@ -309,24 +241,13 @@ class Tester():
         print('auc=',auc)
         for k, v in records.items():
             records[k] = sum(records[k]) / len(records[k])
-        #self.label_hat1400 = np.array(self.label_hat1400)
-        #self.label_hat1350 = np.array(self.label_hat1350)
-        #self.label_hat1300 = np.array(self.label_hat1300)
-        #self.label = np.array(self.label)
-        #print(self.label_hat)
-        #min_max_scaler = preprocessing.MinMaxScaler(feature_range=(0, 1), copy=False)
-        #per_loss = np.array(per_loss)
+
         print(per_loss_new)
         per_loss_new = np.array(per_loss_new)
         #print(per_loss.shape)
         #per_loss = np.expand_dims(per_loss, axis=1)
         per_loss_new = np.expand_dims(per_loss_new, axis=1)
-        #print(per_loss.shape)
-        #per_loss_new = min_max_scaler.fit_transform(per_loss_new)
-        #per_loss = min_max_scaler.fit_transform(per_loss)
 
-        #print(self.label)
-        #length = len(self.label)
         label_hat = []
 
         TP1 = 0
@@ -370,81 +291,8 @@ class Tester():
         print("recall=", recall1)
         print("F1=", F1)
         print("FPR=",FPR)
-        """"
-        count = 0
-        TP1 = 0
-        TN1 = 0
-        FP1 = 0
-        FN1 = 0
-
-        for k in range(length):
-            if self.label_hat1400[k] == self.label[k]:
-                count = count + 1
-            if int(self.label_hat1400[k]) == 0 and int(self.label[k])== 0:
-                TP1 = TP1+1
-            if int(self.label_hat1400[k]) == 1 and int(self.label[k]) == 0:
-                FN1 = FN1+1
-            if int(self.label_hat1400[k]) == 1 and int(self.label[k]) == 1:
-                TN1 = TN1+1
-            if int(self.label_hat1400[k]) == 0 and int(self.label[k]) == 1:
-                FP1 = FP1 + 1
-        #print(TP)
-        #print(FP)
-        #print(TN)
-        #print(FN)
-        acc1 =  (TP1+TN1)/(TP1+TN1+FP1+FN1)
-        per1 = TP1/(TP1 + FP1)
-        recall1 = TP1/(TP1 + FN1)
-        TP2 = 0
-        TN2 = 0
-        FP2 = 0
-        FN2 = 0
-
-        for k in range(length):
-            if self.label_hat1350[k] == self.label[k]:
-                count = count + 1
-            if int(self.label_hat1350[k]) == 0 and int(self.label[k]) == 0:
-                TP2 = TP2 + 1
-            if int(self.label_hat1350[k]) == 1 and int(self.label[k]) == 0:
-                FN2 = FN2 + 1
-            if int(self.label_hat1350[k]) == 1 and int(self.label[k]) == 1:
-                TN2 = TN2 + 1
-            if int(self.label_hat1350[k]) == 0 and int(self.label[k]) == 1:
-                FP2 = FP2 + 1
-        # print(TP)
-        # print(FP)
-        # print(TN)
-        # print(FN)
-        acc2 = (TP2 + TN2) / (TP2 + TN2 + FP2 + FN2)
-        per2 = TP2 / (TP2 + FP2)
-        recall2 = TP2 / (TP2 + FN2)
-
-        TP3 = 0
-        TN3 = 0
-        FP3 = 0
-        FN3 = 0
-
-        for k in range(length):
-            if self.label_hat1300[k] == self.label[k]:
-                count = count + 1
-            if int(self.label_hat1300[k]) == 0 and int(self.label[k]) == 0:
-                TP3 = TP3 + 1
-            if int(self.label_hat1300[k]) == 1 and int(self.label[k]) == 0:
-                FN3 = FN3 + 1
-            if int(self.label_hat1300[k]) == 1 and int(self.label[k]) == 1:
-                TN3 = TN3 + 1
-            if int(self.label_hat1300[k]) == 0 and int(self.label[k]) == 1:
-                FP3 = FP3 + 1
-        # print(TP)
-        # print(FP)
-        # print(TN)
-        # print(FN)
-        acc3 = (TP3 + TN3) / (TP3 + TN3 + FP3 + FN3)
-        per3 = TP3 / (TP3 + FP3)
-        recall3 = TP3 / (TP3 + FN3)
 
 
-"""
         loss = records['loss']
         rec_loss = records['rec_loss']
         rec_error = records['rec_error']
@@ -452,20 +300,6 @@ class Tester():
         condi_loss = records['condi_loss']
         cls_loss = records['cls_loss']
         cls_acc = records['cls_acc']
-        #print(per_loss_new)
-        #print("recalllist",recall_list)
-        #print("F1list",f1_list)
-        #print("ACClist",acc_list)
-        #print("prelist",pre_list)
-        #np.savez(os.path.join(self.data_dir, 'SKIPAE_new_new.npz'), fpr=fpr_list, tpr=recall_list)
-        #hm = sns.heatmap(mem)
-        #plt.show()
-
-        """print(memw[1].cpu())
-        print(memw[200].cpu())
-        print(memw[1995].cpu())
-        print(memw[1996].cpu())
-        """
 
 
         print('='*100)
@@ -479,33 +313,20 @@ class Tester():
                   .format(condi_loss=condi_loss, end=' '))
         print('Cls_loss: {cls_loss:.4f}, Cls acc: {cls_acc:.4f}' \
                   .format(cls_loss=cls_loss, cls_acc=cls_acc, end=' '))
-        """
-        print('yuzhi=1400')
-        print('ACC:',acc1)
-        print('PRE',per1)
-        print('RECALL',recall1)
-        print('yuzhi=1350')
-        print('ACC:', acc2)
-        print('PRE', per2)
-        print('RECALL', recall2)
-        print('yuzhi=1300')
-        print('ACC:', acc3)
-        print('PRE', per3)
-        print('RECALL', recall3)
-        """
-        print()
+
         #per_loss_new = 1 - per_loss_new
         #print(per_loss_new)
         encoding=np.array(encoding)
         encodingme = np.array(encodingme)
         #np.savez(os.path.join('anomaly_20memnoskip_trainlong.npz'), encoding=encoding, mem=mem)
         #np.savez(os.path.join('anomaly_100memskip.npz'), encoding=encoding, mem=mem)
-
-        q1, q3 = np.percentile(per_loss_new, (25, 75), interpolation='midpoint')
+        """
+        q1, q3 = np.pecentile(per_loss_new, (25, 75), interpolation='midpoint')
         IQR = q3 - q1
         threshold2 = q3 + 1.5 * IQR
         print(threshold2)
 
+        """
         #np.savez(os.path.join('loss-test-e1t027.npz'),loss=per_loss_new)
         #self.writer.close()
 
