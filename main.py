@@ -32,14 +32,14 @@ def config():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset-dir', type=str, default='')
     parser.add_argument('--testdataset-dir', type=str, default='')
-    #parser.add_argument('--prepro-dir', type=str, default='prepro/MNIST')
+
     parser.add_argument('--testnum-instances', type=int, default=15)
     parser.add_argument('--num-instances', type=int, default=10)
     parser.add_argument('--num-classes', type=int, default=60000)
     parser.add_argument('--num-memories', type=int, default=100)
     parser.add_argument('--sensor-length', type=int, default=1000)
     parser.add_argument('--sensor-channel-size', type=int, default=18)
-    #parser.add_argument('--image-width', type=int, default=28)
+
     parser.add_argument('--image-channel-size', type=int, default=1)
 
     parser.add_argument('--train', action='store_true')

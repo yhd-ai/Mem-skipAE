@@ -26,11 +26,6 @@ class SENSOR_DATASET():
 
 
         self.image_channel_size = cfg.image_channel_size
-        #train_x, test_x = trainprepro(d_path=self.dataset_dir, length=1000,number=2000, normal=True, rate=[0.9, 0.1], enc=True,enc_step=28)
-
-        #train_x = np.expand_dims(train_x, axis=1)
-        #test_x = np.expand_dims(test_x, axis=1)
-        #np.savez(os.path.join(data_dir, 'shuju.npz'), train=train_x, valid=test_x)
 
         """
 
@@ -92,7 +87,7 @@ class SENSOR_DATASET():
         
         test_X = np.expand_dims(test_X, axis=1)
 
-        min_max_scaler = preprocessing.MinMaxScaler(feature_range = (0.3,0.7),copy = False)
+        min_max_scaler = preprocessing.MinMaxScaler(feature_range = (0,1),copy = False)
         for i in range(2000):
             test_X[i][0] = min_max_scaler.fit_transform(test_X[i][0])
 
